@@ -1,6 +1,5 @@
 import { IsNotEmpty, MaxLength } from "class-validator";
 import { Expose } from "class-transformer";
-import { ComentarioDTO } from "../../comentario/models/comentarioDTO";
 
 export class PostagemDTO {
 
@@ -32,6 +31,4 @@ export class PostagemDTO {
     @Expose({name: "medico_id"})
     medico: number
 
-    @Expose({name: "comentarios"})
-    comentarios: ComentarioDTO[]
 }

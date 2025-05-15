@@ -1,11 +1,8 @@
 import { HttpException, HttpStatus, Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { CadastroTemporarioPacienteDTO } from "../model/cadastrotemporariopacientedto";
 import { Medico } from "../../medico/entities/medico.entity";
-import { Paciente } from "../../Paciente/entities/paciente.entity";
 import { Cadastro } from "../entities/cadastro.entity";
 import { DeleteResult, ILike, Repository } from "typeorm";
-import { Comentario } from "src/comentario/entities/comentario.entity";
 import { CadastroTemporarioMedicoDTO } from "../model/cadastrotemporariomedicodto";
 import { matches } from "class-validator";
 
@@ -19,8 +16,6 @@ export class CadastroService {
         @InjectRepository(Medico)
         private medicoRepository: Repository<Medico>,
 
-        @InjectRepository(Paciente)
-        private pacienteRepository: Repository<Paciente>
     ) { }
 
 
@@ -49,7 +44,10 @@ export class CadastroService {
         cadastro.sobrenome = cadastroTemporarioMedicoDTO.sobrenome
         cadastro.senha = cadastroTemporarioMedicoDTO.senha
         
-        medico.crm = cadastroTemporarioMedicoDTO.crm
+        medico.crm = cadastroTemporarioMedicoDTO.cpf
+        medico.photoUrl = cadastroTemporarioMedicoDTO.photoUrl
+        medico.type = cadastroTemporarioMedicoDTO.type
+        medico.cpf = cadastroTemporarioMedicoDTO.cpf
         medico.instagram = cadastroTemporarioMedicoDTO.instagram
         medico.whatsapp = cadastroTemporarioMedicoDTO.whatsapp
         medico.website = cadastroTemporarioMedicoDTO.website
@@ -77,46 +75,9 @@ export class CadastroService {
         })
     }
 
-    async createPaciente(cadastroTemporarioPacienteDTO: CadastroTemporarioPacienteDTO): Promise<Paciente> {
-
-        if (!matches(cadastroTemporarioPacienteDTO.cpf, /^[0-9]+$/)) {
-            throw new HttpException('CPF inválido!', HttpStatus.BAD_REQUEST)
-        } else if (!cadastroTemporarioPacienteDTO.email || !cadastroTemporarioPacienteDTO.email.includes("@")) {
-            throw new HttpException('E-mail já cadastrado!', HttpStatus.UNPROCESSABLE_ENTITY)
-        }
-
-        let emailDisponivel = await this.findCadastroByEmail(cadastroTemporarioPacienteDTO.email)
-        let cpfDisponivel = await this.findCadastroByCpf(cadastroTemporarioPacienteDTO.cpf)
-
-        if(emailDisponivel || cpfDisponivel){
-            throw new HttpException('Dados cadastrais já encontrados no sistema!', HttpStatus.BAD_REQUEST)
-        }
-
-        let cadastro: Cadastro = new Cadastro()
-        let paciente: Paciente = new Paciente()
-
-        cadastro.email = cadastroTemporarioPacienteDTO.email
-        cadastro.nome = cadastroTemporarioPacienteDTO.nome
-        cadastro.cpf = cadastroTemporarioPacienteDTO.cpf
-        cadastro.sobrenome = cadastroTemporarioPacienteDTO.sobrenome
-        cadastro.senha = cadastroTemporarioPacienteDTO.senha
-
-        paciente.convenio = cadastroTemporarioPacienteDTO.convenio
-
-        let novoCadastro = await this.cadastroRepository.save(cadastro)
-
-        paciente.cadastro = novoCadastro
-
-        return this.pacienteRepository.save(paciente)
-    }
-
     async findAll(): Promise<Cadastro[]> {
 
-        return this.cadastroRepository.find({
-            relations: {
-                comentarios: true,
-            }
-        })
+        return this.cadastroRepository.find();
     }
 
     async findById(id: number): Promise<Cadastro> {
@@ -124,25 +85,6 @@ export class CadastroService {
         let cadastroProcurado = this.cadastroRepository.findOne({
             where: {
                 id
-            }, relations: {
-                comentarios: true
-            }
-        })
-
-        if (!cadastroProcurado) {
-            throw new HttpException('Cadastro não encontrado!', HttpStatus.NOT_FOUND)
-        }
-
-        return cadastroProcurado
-    }
-
-    async findPacienteById(id: number): Promise<Paciente> {
-
-        const cadastroProcurado = this.pacienteRepository.findOne({
-            where: {
-                id
-            }, relations: {
-                cadastro: true
             }
         })
 
@@ -157,7 +99,7 @@ export class CadastroService {
 
         const cadastroProcurado = this.medicoRepository.findOne({
             where: {
-                crm
+                cpf: crm
             }, relations: {
                 cadastro: true
             }
@@ -204,7 +146,7 @@ export class CadastroService {
         cadastro.senha = cadastroTemporarioMedicoDTO.senha
 
         medico.id = medicoUpdate.id
-        medico.crm = cadastroTemporarioMedicoDTO.crm
+        medico.cpf = cadastroTemporarioMedicoDTO.crm
 
         let novoCadastro = await this.cadastroRepository.save(cadastro)
 
@@ -213,64 +155,13 @@ export class CadastroService {
         return this.medicoRepository.save(medico)
     }
 
-    async updatePaciente(cadastroTemporarioPacienteDTO: CadastroTemporarioPacienteDTO): Promise<Paciente> {
-
-        const pacienteUpdate = await this.findPacienteById(cadastroTemporarioPacienteDTO.id)
-
-        if (!pacienteUpdate || !cadastroTemporarioPacienteDTO.id) {
-            throw new HttpException('Paciente não encontrado!', HttpStatus.NOT_FOUND)
-        } else if (!matches(cadastroTemporarioPacienteDTO.cpf, /^[0-9]+$/)) {
-            throw new HttpException('CPF inválido!', HttpStatus.BAD_REQUEST)
-        } else if (!cadastroTemporarioPacienteDTO.email || !cadastroTemporarioPacienteDTO.email.includes("@")) {
-            throw new HttpException('E-mail já cadastrado!', HttpStatus.UNPROCESSABLE_ENTITY)
-        }
-
-        let cadastro: Cadastro = new Cadastro()
-        let paciente: Paciente = new Paciente()
-
-        cadastro.id = pacienteUpdate.cadastro.id
-        cadastro.email = cadastroTemporarioPacienteDTO.email
-        cadastro.nome = cadastroTemporarioPacienteDTO.nome
-        cadastro.cpf = cadastroTemporarioPacienteDTO.cpf
-        cadastro.sobrenome = cadastroTemporarioPacienteDTO.sobrenome
-        cadastro.senha = cadastroTemporarioPacienteDTO.senha
-
-        paciente.id = cadastroTemporarioPacienteDTO.id
-        paciente.convenio = cadastroTemporarioPacienteDTO.convenio
-
-        const novoCadastro = await this.cadastroRepository.save(cadastro)
-
-        paciente.cadastro = novoCadastro
-
-        return this.pacienteRepository.save(paciente)
-    }
-
     async findByName(nome: string): Promise<Cadastro[]> {
 
         return this.cadastroRepository.find({
             where: {
                 nome: ILike(`%${nome}%`)
-            }, relations: {
-                comentarios: true
             }
         })
-    }
-
-    async findComentariosByCadastroId(id: number): Promise<Comentario[]> {
-
-        let cadastro = await this.cadastroRepository.findOne({
-            where: {
-                id
-            }, relations: {
-                comentarios: true,
-            }
-        })
-
-        if (!cadastro)
-            throw new HttpException('Postagem não encontrada!', HttpStatus.NOT_FOUND)
-
-        return cadastro.comentarios
-        
     }
 
     async findByEmail(email: string): Promise<Cadastro> {
@@ -278,8 +169,6 @@ export class CadastroService {
         let cadastro = await this.cadastroRepository.findOne({
             where: {
                 email
-            }, relations: {
-                comentarios: true,
             }
         })
 

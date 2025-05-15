@@ -12,6 +12,11 @@ export class CadastroTemporarioMedicoDTO {
     cpf: string
 
     @IsNotEmpty()
+    @Length(11)
+    @ApiProperty()
+    crm: string
+
+    @IsNotEmpty()
     @MaxLength(255)
     @ApiProperty()
     nome: string
@@ -31,9 +36,11 @@ export class CadastroTemporarioMedicoDTO {
     @ApiProperty()
     email: string
 
-    @MaxLength(13)
     @ApiProperty()
-    crm: string
+    photoUrl: string
+
+    @ApiProperty()
+    type: string
 
     @ApiProperty()
     whatsapp: string

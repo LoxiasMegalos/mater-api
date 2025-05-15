@@ -1,6 +1,5 @@
 import { HttpException, HttpStatus, Injectable } from "@nestjs/common"
-import { InjectRepository } from "@nestjs/typeorm"
-import { Comentario } from "../../comentario/entities/comentario.entity";
+import { InjectRepository } from "@nestjs/typeorm";
 import { DeleteResult, ILike, Repository } from "typeorm";
 import { Postagem } from "../entities/postagem.entity";
 
@@ -21,7 +20,6 @@ export class PostagemService {
             },
             relations: {
                 tema: true,
-                comentarios: true,
                 medico: {
                     cadastro : true
                 }
@@ -38,7 +36,6 @@ export class PostagemService {
                 id : "DESC"
             }, relations: {
                 tema: true,
-                comentarios: true,
                 medico: {
                     cadastro : true
                 }
@@ -51,27 +48,6 @@ export class PostagemService {
         return postagem
     }
 
-    async findComentariosByPostagemId(id: number): Promise<Comentario[]> {
-        
-        let postagem = await this.postagemRepository.findOne({
-            where: {
-                id
-            }, relations: {
-                tema: true,
-                comentarios: true,
-                medico: {
-                    cadastro : true
-                }
-            }
-        })
-
-        if (!postagem)
-            throw new HttpException('Postagem não encontrada!', HttpStatus.NOT_FOUND)
-
-        return postagem.comentarios
-        
-    }
-
     async findByTitle(titulo: string): Promise<Postagem[]> {
 
         let postagem = this.postagemRepository.find({
@@ -79,7 +55,6 @@ export class PostagemService {
                 titulo: ILike(`%${titulo}%`)
             }, relations: {
                 tema: true,
-                comentarios: true,
                 medico: {
                     cadastro : true
                 }

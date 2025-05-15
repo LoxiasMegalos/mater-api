@@ -1,5 +1,4 @@
 import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, ParseIntPipe, Post, Put } from "@nestjs/common";
-import { Comentario } from "../../comentario/entities/comentario.entity";
 import { DeleteResult } from "typeorm";
 import { Postagem } from "../entities/postagem.entity";
 import { PostagemService } from "../services/postagem.service";
@@ -32,13 +31,6 @@ export class PostagemController {
     @HttpCode(HttpStatus.OK)
     findById(@Param('id', ParseIntPipe) id: number): Promise<Postagem> {
         return this.service.findById(id)
-    }
-
-    @ApiOkResponse({ description: 'The resources were returned successfully'})
-    @Get('/comentarios/:id')
-    @HttpCode(HttpStatus.OK)
-    findComentariosByPostagemId(@Param('id', ParseIntPipe) id: number): Promise<Comentario[]> {
-        return this.service.findComentariosByPostagemId(id)
     }
 
     @ApiOkResponse({ description: 'Os recursos foram retornados com sucesso!' })

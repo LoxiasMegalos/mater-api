@@ -1,7 +1,6 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { IsNotEmpty, MaxLength, Length, MinLength  } from "class-validator";
 import { Column, Entity, PrimaryGeneratedColumn, OneToMany } from "typeorm";
-import { Comentario } from "../../comentario/entities/comentario.entity";
 
 @Entity('tb_cadastros')
 export class Cadastro {
@@ -47,7 +46,4 @@ export class Cadastro {
     @Column({ nullable: false, unique: true ,length: 255 })
     email: string
 
-    @OneToMany(() => Comentario, (comentarioRealizado) => comentarioRealizado.cadastro)
-    @ApiProperty({type: () => Comentario})
-    comentarios: Comentario[]
 }

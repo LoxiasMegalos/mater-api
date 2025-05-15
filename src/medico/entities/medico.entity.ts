@@ -12,10 +12,17 @@ export class Medico {
     id: number
 
     @ApiProperty({
-        description: 'Precisa de conter exatamente 13 caracteres'
+        description: 'Precisa de conter exatamente 11 caracteres'
     })
-    @Length(13)
-    @Column({ nullable: false, unique: true, length: 13 })
+    @Length(11)
+    @Column({ nullable: false, unique: true, length: 11 })
+    cpf: string
+
+    @ApiProperty({
+        description: 'identification'
+    })
+    @Length(11)
+    @Column({ nullable: false, unique: true, length: 11 })
     crm: string
 
     @ApiProperty({
@@ -29,6 +36,18 @@ export class Medico {
     })
     @Column({ nullable: false, unique: true})
     whatsapp: string
+
+    @ApiProperty({
+    description: 'Type of medical specialty'
+    })
+    @Column({ nullable: false, unique: true})
+    type: string
+
+    @ApiProperty({
+    description: 'Photo URL'
+    })
+    @Column({ nullable: false, unique: true})
+    photoUrl: string
 
     @ApiProperty({
     description: 'Website'

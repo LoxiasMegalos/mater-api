@@ -1,7 +1,6 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { IsNotEmpty, MaxLength, MinLength } from "class-validator";
-import { Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
-import { Comentario } from "../../comentario/entities/comentario.entity";
+import { Column, Entity, ManyToOne,  PrimaryGeneratedColumn } from "typeorm";
 import { Medico } from "../../medico/entities/medico.entity";
 import { Tema } from "../../tema/entities/tema.entity";
 
@@ -56,7 +55,4 @@ export class Postagem {
     @ApiProperty({type: () => Medico})
     medico: Medico
 
-    @OneToMany(() => Comentario, (comentarioReferencia) => comentarioReferencia.postagem)
-    @ApiProperty({type: () => Comentario})
-    comentarios: Comentario[]
 }

@@ -2,9 +2,7 @@ import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, ParseIntPip
 import { CadastroService } from "../services/cadastro.service";
 import { DeleteResult } from "typeorm";
 import { Cadastro } from "../entities/cadastro.entity";
-import { Paciente } from "../../Paciente/entities/paciente.entity";
 import { Medico } from "../../medico/entities/medico.entity";
-import { Comentario } from "../../comentario/entities/comentario.entity";
 import { ApiBadRequestResponse, ApiBody, ApiCreatedResponse, ApiNoContentResponse, ApiNotFoundResponse, ApiOkResponse, ApiParam, ApiResponse, ApiTags, ApiUnprocessableEntityResponse } from "@nestjs/swagger";
 import { CadastroTemporarioPacienteDTO } from "../model/cadastrotemporariopacientedto";
 import { CadastroTemporarioMedicoDTO } from "../model/cadastrotemporariomedicodto";
@@ -29,20 +27,6 @@ export class CadastroController {
     @HttpCode(HttpStatus.CREATED)
     createMedico(@Body() cadastroTemporarioMedicoDTO: CadastroTemporarioMedicoDTO): Promise<Medico> {
         return this.service.createMedico(cadastroTemporarioMedicoDTO)
-    }
-
-    @ApiBody({
-        required: true,
-        description: 'Deve conter todos os dados requisitados no CadastroTemporarioPacienteDTO',
-        type: CadastroTemporarioPacienteDTO
-    })
-    @ApiCreatedResponse({ description: 'Created Succesfully' })
-    @ApiUnprocessableEntityResponse({ description: 'Unprocessable Entity' })
-    @ApiBadRequestResponse({ description: 'Bad Request' })
-    @Post('/paciente')
-    @HttpCode(HttpStatus.CREATED)
-    createPaciente(@Body() cadastroTemporarioPacienteDTO: CadastroTemporarioPacienteDTO): Promise<Paciente> {
-        return this.service.createPaciente(cadastroTemporarioPacienteDTO)
     }
 
     @ApiParam({
@@ -79,18 +63,6 @@ export class CadastroController {
         return this.service.findAll()
     }
 
-    @ApiParam({
-        name: 'id',
-        required: true,
-        description: 'Tem de ser o ID de um cadastro existente no banco de dados!',
-        type: Number
-    })
-    @ApiOkResponse({ description: 'The resources were returned successfully' })
-    @Get('/comentarios/:id')
-    @HttpCode(HttpStatus.OK)
-    findComentariosByCadastroId(@Param('id', ParseIntPipe) id: number): Promise<Comentario[]> {
-        return this.service.findComentariosByCadastroId(id)
-    }
 
     @ApiBody({
         required: true,
@@ -107,18 +79,4 @@ export class CadastroController {
         return this.service.updateMedico(cadastroTemporarioMedicoDTO)
     }
 
-    @ApiBody({
-        required: true,
-        description: 'Deve conter todos os dados requisitados no CadastroTemporarioPacienteDTO',
-        type: CadastroTemporarioPacienteDTO
-    })
-    @ApiOkResponse({ description: 'The resource was updated successfully' })
-    @ApiNotFoundResponse({ description: 'Resource not found' })
-    @ApiBadRequestResponse({ description: 'Bad Request' })
-    @ApiUnprocessableEntityResponse({ description: 'Unprocessable Entity' })
-    @Put('/paciente')
-    @HttpCode(HttpStatus.OK)
-    updatePaciente(@Body() cadastroTemporarioPacienteDTO: CadastroTemporarioPacienteDTO): Promise<Paciente> {
-        return this.service.updatePaciente(cadastroTemporarioPacienteDTO)
-    }
 }
